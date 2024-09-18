@@ -1,0 +1,28 @@
+.post-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 20px;
+}
+
+.post-actions .fa-edit,
+.post-actions .fa-trash {
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.post-actions .fa-edit {
+  color: #767876;
+}
+
+.post-actions .fa-trash {
+  color: #191919;
+}
+
+.post-actions .fa-edit:hover,
+.post-actions .fa-trash:hover {
+  color: #191919;
+  transform: scale(1.2);
+}
