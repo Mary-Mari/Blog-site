@@ -3,20 +3,33 @@ import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // В данном примере авторизация не реализована, просто сохраняем фиктивные данные в localStorage
-    localStorage.setItem("user", JSON.stringify({ name, email }));
-    navigate("/post");
-  };
 
+    try {
+      await axios.post("http://localhost:3000/auth/register", {
+        name,
+        email,
+        password,
+      });
+      navigate("/login");
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        setErrorMessage("Этот email уже зарегистрирован");
+      } else {
+        setErrorMessage("Ошибка при регистрации. Попробуйте снова.");
+      }
+    }
+  };
   return (
     <div
       style={{
@@ -42,6 +55,7 @@ const Register = () => {
         <h2 style={{ color: "#6e99c3", textAlign: "center" }}>
           Создать профиль
         </h2>
+        {errorMessage && <p style={{ color: "red", fontSize: '16px' }}>{errorMessage}</p>}
 
         {/* Круг для фото профиля */}
         <div

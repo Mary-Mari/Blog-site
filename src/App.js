@@ -18,25 +18,24 @@ import  AddPost  from "./Pages/AddPost/AddPost";
 function App() {
   const [posts] = React.useState([]);
 
- 
-
   return (
     <Router>
-      <Header />
-      
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/post" element={<PostPage />} />
-        <Route path="/post/:id" element={<FullPost />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog-feed" element={<BlogFeedPage />} />
-        <Route path="/blog-feed" element={<BlogFeedPage posts={posts} />} />
-        <Route path="/add-post" element={<AddPost/>} />
-        
-      </Routes>
-      <Footer />
+      <div className="page-container">
+        <Header />
+        <div className="content-wrap">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/post" element={<PostPage />} />
+            <Route path="/post/:id" element={<FullPost />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog-feed" element={<BlogFeedPage posts={posts}/>} />
+            <Route path="/add-post" element={<AddPost />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
     </Router>
   );
 }

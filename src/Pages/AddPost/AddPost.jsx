@@ -1,18 +1,22 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
-import SimpleMDE from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
-import { X } from "react-bootstrap-icons";
-import { useNavigate } from "react-router-dom";
-import styles from "./AddPost.module.scss";
+
+import React, { useState, useCallback, useMemo } from 'react';
+import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import SimpleMDE from 'react-simplemde-editor';
+import 'easymde/dist/easymde.min.css';
+import { X } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addPost } from '../../redux/slices/postsSlice'; 
+import styles from './AddPost.module.scss';
 
 export const AddPost = () => {
-  const [value, setValue] = useState("");
-  const [title, setTitle] = useState("");
-  const [tags, setTags] = useState("");
+  const [value, setValue] = useState('');
+  const [title, setTitle] = useState('');
+  const [tags, setTags] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [coverImagePreview, setCoverImagePreview] = useState(null);
+  const [coverImagePreview, setCoverImagePreview] = useState(null); 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const onChange = useCallback((value) => {
     setValue(value);
@@ -21,27 +25,27 @@ export const AddPost = () => {
   const options = useMemo(
     () => ({
       spellChecker: false,
-      maxHeight: "400px",
+      maxHeight: '400px',
       autofocus: true,
-      placeholder: "Введите текст...",
+      placeholder: 'Введите текст...',
       status: false,
       toolbar: [
-        "bold",
-        "italic",
-        "heading",
-        "|",
-        "quote",
-        "unordered-list",
-        "ordered-list",
-        "|",
-        "link",
-        "image",
-        "|",
-        "preview",
-        "side-by-side",
-        "fullscreen",
-        "|",
-        "guide",
+        'bold',
+        'italic',
+        'heading',
+        '|',
+        'quote',
+        'unordered-list',
+        'ordered-list',
+        '|',
+        'link',
+        'image',
+        '|',
+        'preview',
+        'side-by-side',
+        'fullscreen',
+        '|',
+        'guide',
       ],
       autosave: {
         enabled: true,
@@ -64,7 +68,7 @@ export const AddPost = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setCoverImagePreview(reader.result);
+        setCoverImagePreview(reader.result); // Используем только preview
       };
       reader.readAsDataURL(file);
     }
@@ -72,15 +76,22 @@ export const AddPost = () => {
 
   const handlePublish = () => {
     const newPost = {
+      id: Date.now(), 
       title,
-      content: value,
-      tags: tags.split(",").map(tag => tag.trim()), // Преобразование тэгов в массив
       coverImage: coverImagePreview,
+      content: value,
+      tags: tags.split(',').map(tag => tag.trim()),
+      createdAt: new Date().toLocaleDateString(),
+      viewsCount: 0,
+      commentsCount: 0,
+      user: {
+        avatarUrl: "https://via.placeholder.com/50", 
+        fullName: "User Name" 
+      },
     };
 
-    // В реальном приложении здесь будет вызов API для сохранения поста
-
-    navigate("/post", { state: { newPost } }); // Передача данных нового поста
+    dispatch(addPost(newPost)); // Добавляем новый пост в Redux
+    navigate('/post'); // Перенаправляем на страницу постов
   };
 
   return (
@@ -107,21 +118,21 @@ export const AddPost = () => {
             {coverImagePreview && (
               <div
                 style={{
-                  width: "100%",
-                  maxWidth: "800px",
-                  height: "auto",
-                  overflow: "hidden",
-                  border: "2px solid #ccc",
-                  marginTop: "10px",
+                  width: '100%',
+                  maxWidth: '800px',
+                  height: 'auto',
+                  overflow: 'hidden',
+                  border: '2px solid #ccc',
+                  marginTop: '10px',
                 }}
               >
                 <img
                   src={coverImagePreview}
                   alt="Обложка"
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
                   }}
                 />
               </div>
@@ -133,7 +144,7 @@ export const AddPost = () => {
           <Form.Control
             className={`${styles.inputField}`}
             type="text"
-            placeholder="Заголовок статьи..."
+            placeholder="Заголовок блога..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -172,7 +183,7 @@ export const AddPost = () => {
           <Button
             variant="link"
             onClick={handleClose}
-            style={{ float: "right", color: "#2a2c2c" }}
+            style={{ float: 'right', color: '#2a2c2c' }}
           >
             <X size={30} />
           </Button>
@@ -181,22 +192,22 @@ export const AddPost = () => {
           {coverImagePreview && (
             <div
               style={{
-                width: "100%",
-                maxWidth: "100%",
-                height: "auto",
-                maxHeight: "400px",
-                overflow: "hidden",
-                border: "2px solid #ccc",
-                marginBottom: "20px",
+                width: '100%',
+                maxWidth: '100%',
+                height: 'auto',
+                maxHeight: '400px',
+                overflow: 'hidden',
+                border: '2px solid #ccc',
+                marginBottom: '20px',
               }}
             >
               <img
                 src={coverImagePreview}
                 alt="Обложка"
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
                 }}
               />
             </div>
@@ -213,6 +224,7 @@ export const AddPost = () => {
           >
             Подтвердить
           </Button>
+
           <Button
             variant="secondary"
             onClick={handleClose}

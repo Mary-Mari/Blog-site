@@ -10,11 +10,9 @@ function Footer() {
       style={{
         backgroundColor: "#ffff",
         width: '100%',
-        height: '60px', 
+        height: '60px',
         padding: '10px',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-        position: 'relative', // Или absolute, если нужно
-        bottom: 0,
       }}
     >
       <Container>

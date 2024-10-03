@@ -1,77 +1,129 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import Post from "../Components/Post";
 import CommentsBlock from "../Components/CommentsBlock";
-import { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import {
+  addComment,
+  deleteComment,
+  deletePost,
+} from "../redux/slices/postsSlice";
 
 const FullPost = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const posts = useSelector((state) => state.posts.posts);
+  const post = posts.find((post) => post.id === parseInt(id));
 
-  const [comments, setComments] = useState([
-    {
-      user: {
-        fullName: "Вася Пупкин",
-        avatarUrl: "https://mui.com/static/images/avatar/1.jpg",
-      },
-      text: "Это тестовый комментарий 555555",
-    },
-    {
-      user: {
-        fullName: "Иван Иванов",
-        avatarUrl: "https://mui.com/static/images/avatar/2.jpg",
-      },
-      text: "When displaying three lines or more, the avatar is not aligned at the top. You should set the prop to align the avatar at the top",
-    },
-  ]);
+  const [newComment, setNewComment] = useState("");
 
-  const handleAddComment = (text) => {
-    setComments([
-      {
-        user: {
-          fullName: "Пользователь",
-          avatarUrl: "https://mui.com/static/images/avatar/3.jpg",
-        },
-        text,
-      },
-      ...comments,
-    ]);
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      dispatch(
+        addComment({
+          postId: post.id,
+          comment: {
+            id: Date.now(),
+            text: newComment,
+            createdAt: new Date().toLocaleDateString(),
+          },
+        })
+      );
+      setNewComment("");
+    }
   };
+
+  const handleDeleteComment = (commentId) => {
+    dispatch(deleteComment({ postId: post.id, commentId }));
+  };
+
+  const handleDeletePost = () => {
+    dispatch(deletePost(post.id));
+    navigate("/post");
+  };
+
+  if (!post) {
+    return <div>Post not found</div>;
+  }
 
   return (
     <Container style={{ marginTop: "20px" }}>
       <Row className="justify-content-center">
         <Col md={8}>
           <Post
-            id={id}
-            title="Roast the code #1 | Rock Paper Scissors"
-            imageUrl="https://res.cloudinary.com/practicaldev/image/fetch/s--UnAfrEG8--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png"
-            user={{
-              avatarUrl:
-                "https://res.cloudinary.com/practicaldev/image/fetch/s--uigxYVRB--/c_fill,f_auto,fl_progressive,h_50,q_auto,w_50/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/187971/a5359a24-b652-46be-8898-2c5df32aa6e0.png",
-              fullName: "Keff",
-            }}
-            createdAt={"12 июня 2022 г."}
-            viewsCount={150}
-            commentsCount={3}
-            tags={["react", "fun", "typescript"]}
+            id={post.id}
+            title={post.title}
+            imageUrl={post.coverImage}
+            user={post.user}
+            createdAt={post.createdAt}
+            viewsCount={post.viewsCount}
+            commentsCount={post.comments ? post.comments.length : 0}
+            tags={post.tags}
             isFullPost
-            style={{ maxWidth: "100%" }}
           >
-            <p>
-              Hey there! 👋 I'm starting a new series called "Roast the Code",
-              where I will share some code, and let YOU roast and improve it.
-              There's not much more to it, just be polite and constructive, this
-              is an exercise so we can all learn together. Now then, head over
-              to the repo and roast as hard as you can!!
-            </p>
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
           </Post>
+
+          {/* Кнопки для редактирования и удаления поста */}
+          <div
+            style={{
+              marginBottom: "20px",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            {/* <Button
+              variant="warning"
+              style={{ marginRight: "10px", borderRadius: "50px" }}
+              onClick={() => navigate(`/edit-post/${post.id}`)}
+            >
+              Редактировать пост
+            </Button> */}
+            <Button
+              variant="danger"
+              style={{ borderRadius: "50px" }}
+              onClick={handleDeletePost}
+            >
+              Удалить пост
+            </Button>
+          </div>
+
+          {/* Комментарии */}
           <CommentsBlock
-            items={comments}
+            items={post.comments || []}
             isLoading={false}
-            onAddComment={handleAddComment}
-            style={{ maxWidth: "100%" }}
+            //удаление коммента
+            onDeleteComment={handleDeleteComment}
           />
+
+          {/* Форма для добавления нового комментария */}
+          <Form>
+            <Form.Group>
+              <Form.Label>Написать комментарий...</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+            </Form.Group>
+            <Button
+              variant="contained"
+              onClick={handleAddComment}
+              style={{
+                backgroundColor: "#a1c3da",
+                color: "#ffff",
+                borderRadius: "50px",
+                padding: "10px 20px",
+                marginTop: "10px",
+                marginBottom: "20px",
+              }}
+            >
+              Добавить комментарий
+            </Button>
+          </Form>
         </Col>
       </Row>
     </Container>

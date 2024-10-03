@@ -13,7 +13,10 @@ export default class Home extends Component {
             <Col md={6} className="mt-1">
               <h1 className="heading">Get inspired & create stories</h1>
               <p className="subheading">
-                A place to read, write, and deepen your understanding
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum
+                placeat perspiciatis necessitatibus voluptatibus! Ea fugiat
+                vitae, odit sit nobis vero distinctio doloribus asperiores
+                dolorem doloremque. Pariatur facilis minima maxime cupiditate!
               </p>
               <Link to="/register">
                 <Button

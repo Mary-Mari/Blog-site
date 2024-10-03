@@ -2,20 +2,31 @@ import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    localStorage.setItem("user", JSON.stringify({ email }));
-
-    navigate("/post");
+  
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', { email, password });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        navigate("/post");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setErrorMessage("Неверные данные");
+      } else {
+        setErrorMessage("Неверный mail или пароль. Попробуйте снова.");
+      }
+    }
   };
-
   return (
     <div
       style={{
@@ -39,6 +50,7 @@ const Login = () => {
         }}
       >
         <h2 style={{ color: "#6e99c3", textAlign: "center" }}>
+        {errorMessage && <p style={{ color: "red", fontSize: '16px'}}>{errorMessage}</p>}
           Войти в аккаунт
         </h2>
         <form onSubmit={handleSubmit}>

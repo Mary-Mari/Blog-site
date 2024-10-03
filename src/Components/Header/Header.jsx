@@ -6,11 +6,13 @@ function Header() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("token"); // Удаляем токен
+    
     navigate("/");
   };
 
-  const isAuthenticated = !!localStorage.getItem("user");
+  const isAuthenticated = !!localStorage.getItem("token"); // Проверяем наличие токена
+  
 
   return (
     <Navbar
@@ -32,6 +34,9 @@ function Header() {
         <Nav className="ml-auto d-flex align-items-center">
           {isAuthenticated ? (
             <>
+              {/* <span style={{ marginRight: "16px", color: "#a1c3da", fontSize: "18px" }}>
+                Привет, {username}!
+              </span> */}
               <Button
                 as={Link}
                 to="/add-post"
