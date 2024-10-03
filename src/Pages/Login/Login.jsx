@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import axios from 'axios';
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,23 +8,24 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-  
-    try {
-      const response = await axios.post('http://localhost:3000/auth/login', { email, password });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        navigate("/post");
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setErrorMessage("Неверные данные");
-      } else {
-        setErrorMessage("Неверный mail или пароль. Попробуйте снова.");
-      }
+
+    // Получаем данные пользователей из localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    
+    
+    const user = users.find(user => user.email === email && user.password === password);
+
+    if (user) {
+      
+      localStorage.setItem('token', 'dummy-token'); 
+      navigate("/post");
+    } else {
+      setErrorMessage("Неверные данные");
     }
   };
+
   return (
     <div
       style={{
@@ -50,7 +49,7 @@ const Login = () => {
         }}
       >
         <h2 style={{ color: "#6e99c3", textAlign: "center" }}>
-        {errorMessage && <p style={{ color: "red", fontSize: '16px'}}>{errorMessage}</p>}
+          {errorMessage && <p style={{ color: "red", fontSize: '16px'}}>{errorMessage}</p>}
           Войти в аккаунт
         </h2>
         <form onSubmit={handleSubmit}>

@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
-import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,24 +10,26 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      await axios.post("http://localhost:3000/auth/register", {
-        name,
-        email,
-        password,
-      });
-      navigate("/login");
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        setErrorMessage("Этот email уже зарегистрирован");
-      } else {
-        setErrorMessage("Ошибка при регистрации. Попробуйте снова.");
-      }
+    // Получаем существующих пользователей из localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    
+    // Проверяем, существует ли уже пользователь с таким email
+    const existingUser = users.find(user => user.email === email);
+    if (existingUser) {
+      setErrorMessage("Этот email уже зарегистрирован");
+      return;
     }
+
+    // Добавляем нового пользователя
+    users.push({ name, email, password });
+    localStorage.setItem("users", JSON.stringify(users));
+
+    navigate("/login");
   };
+
   return (
     <div
       style={{
@@ -57,7 +57,6 @@ const Register = () => {
         </h2>
         {errorMessage && <p style={{ color: "red", fontSize: '16px' }}>{errorMessage}</p>}
 
-        {/* Круг для фото профиля */}
         <div
           style={{
             width: "100px",
